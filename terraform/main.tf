@@ -8,17 +8,21 @@ terraform {
 }
 
 provider "google" {
-  project = "develop-458412"
-  region  = "us-central1"
-  zone    = "us-central1-c"
+  project = var.project
+  region  = var.region
+  zone    = var.zone
 }
 
-resource "google_project_service" "compute" {
-  project = "develop-458412"
-  service = "compute.googleapis.com"
+resource "google_project_service" "services" {
+  for_each           = toset(var.services)
+  project            = var.project
+  service            = each.value
+  disable_on_destroy = false
 }
 
-resource "google_compute_network" "vpc_network" {
-  depends_on = [google_project_service.compute]
-  name       = "terraform-network"
+module "cloudrun" {
+  source     = "./modules/cloudrun"
+  project    = var.project
+  region     = var.region
+  depends_on = [google_project_service.services]
 }
