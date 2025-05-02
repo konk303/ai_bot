@@ -26,6 +26,13 @@ def message_hello(message, say):
         text=f"こんにちは、<@{message['user']}> さん！",
     )
 
+@app.action("button_click")
+def action_button_click(body, ack, say):
+    # アクションを確認したことを即時で応答します
+    ack()
+    # チャンネルにメッセージを投稿します
+    say(f"<@{body['user']['id']}> さんがボタンをクリックしました！")
+
 if __name__ == "__main__":
     # アプリを起動して、ソケットモードで Slack に接続します
     SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]).start()
