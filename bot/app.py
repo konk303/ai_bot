@@ -11,7 +11,20 @@ app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
 @app.message("こんにちは")
 def message_hello(message, say):
     # イベントがトリガーされたチャンネルへ say() でメッセージを送信します
-    say(f"こんにちは、<@{message['user']}> さん！")
+    say(
+        blocks=[
+            {
+                "type": "section",
+                "text": {"type": "mrkdwn", "text": f"こんにちは、<@{message['user']}> さん！"},
+                "accessory": {
+                    "type": "button",
+                    "text": {"type": "plain_text", "text": "クリックしてください"},
+                    "action_id": "button_click"
+                }
+            }
+        ],
+        text=f"こんにちは、<@{message['user']}> さん！",
+    )
 
 if __name__ == "__main__":
     # アプリを起動して、ソケットモードで Slack に接続します
