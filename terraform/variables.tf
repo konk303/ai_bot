@@ -11,6 +11,7 @@ variable "zone" {
 variable "services" {
   type = list(string)
   default = [
+    "aiplatform.googleapis.com",
     "artifactregistry.googleapis.com",
     "run.googleapis.com",
     # "compute.googleapis.com",
