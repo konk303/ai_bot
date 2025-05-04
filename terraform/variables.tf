@@ -12,6 +12,9 @@ variable "services" {
   type = list(string)
   default = [
     "aiplatform.googleapis.com",
+    "logging.googleapis.com",
+    "monitoring.googleapis.com",
+    "cloudtrace.googleapis.com",
     "artifactregistry.googleapis.com",
     "run.googleapis.com",
     # "compute.googleapis.com",
