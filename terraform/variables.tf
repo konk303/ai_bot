@@ -1,11 +1,11 @@
 variable "project" {}
 
 variable "region" {
-  default = "us-central1"
+  default = "asia-northeast1"
 }
 
 variable "zone" {
-  default = "us-central1-c"
+  default = "asia-northeast1-c"
 }
 
 variable "services" {
