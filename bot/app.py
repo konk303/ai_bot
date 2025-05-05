@@ -1,16 +1,15 @@
 import os
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
-from vertexai import agent_engines
+import agent
 
-agent_engine = agent_engines.get('projects/69263171180/locations/us-central1/reasoningEngines/6920422942245388288')
-remote_session = agent_engine.create_session(user_id="u_456")
+SLACK_BOT_USER_ID = "U08QRHY4R42"  # BotのユーザID
+SLACK_DELETE_REACTION = "del_gemini"  # 削除用のリアクションを作成しておく
 
 # ボットトークンを渡してアプリを初期化します
 app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
 
-# 'こんにちは' を含むメッセージをリッスンします
-# 指定可能なリスナーのメソッド引数の一覧は以下のモジュールドキュメントを参考にしてください：
+# https://tools.slack.dev/bolt-python/ja-jp/getting-started/
 # https://tools.slack.dev/bolt-python/api-docs/slack_bolt/kwargs_injection/args.html
 @app.event("message")
 def event_message(event, say):
@@ -21,31 +20,70 @@ def event_message(event, say):
     if event.get("channel_type") != "im":
         return
 
-    for event in agent_engine.stream_query(
-        user_id="u_456",
-        session_id=remote_session["id"],
-        message=event["text"]
+    thread_id = event["thread_ts"] if "thread_ts" in event else event["ts"]
+    say({
+        "text": agent.create_answer(str(thread_id), event["text"]),
+        "thread_ts": event["ts"]
+    })
+
+@app.event("app_mention")
+def event_mention(event, say):
+    """
+    ボットがメンションされた場合に返信する.
+    """
+    print(event)
+    thread_id = event["thread_ts"] if "thread_ts" in event else event["ts"]
+    say({
+        "text": agent.create_answer(str(thread_id), event["text"]),
+        "thread_ts": event["ts"]
+    })
+
+@app.event("reaction_added")
+def message_delete(event):
+    """
+    削除用のリアクションがついた場合に発言を削除する.
+    """
+    if (
+        event["reaction"] == SLACK_DELETE_REACTION
+        and event["item_user"] == SLACK_BOT_USER_ID
     ):
-        result = event['content']['parts'][0]
-        if 'text' in result:
-            say(result['text'])
+        response = app.client.chat_delete(
+            channel=event["item"]["channel"], ts=event["item"]["ts"]
+        )
 
-
-@app.action("button_click")
-def action_button_click(body, ack, say):
-    # アクションを確認したことを即時で応答します
+@app.command("/gemini")
+def handle_slash_command(ack, client, command):
+    """
+    スラッシュコマンドを実行する.
+    """
     ack()
-    # チャンネルにメッセージを投稿します
-    say(f"<@{body['user']['id']}> さんがボタンをクリックしました！")
-    for event in agent_engine.stream_query(
-        user_id="u_456",
-        session_id=remote_session["id"],
-        message="whats the weather in new york",
-    ):
-        result = event['content']['parts'][0]
-        if 'text' in result:
-            say(result['text'])
+
+    def post_ephemeral_message(text):
+        client.chat_postEphemeral(
+            channel=command["channel_id"], user=command["user_id"], text=text
+        )
+
+    # /monochat [text] の [text] 部分.
+    split = command["text"].split(" ")
+    subcommand, arguments = split[0], split[1:]
+
+    # monochat の使い方を表示する.
+    if subcommand == "help":
+        post_ephemeral_message(
+            "\n".join([
+                "1. Gemini をメンションすると Azure OpenAI Service (ChatGPT) からのレスポンスが返されます。",
+                "2. スレッド内でやり取りを繰り返すと、それまでの会話を考慮した回答がおこなわれます。",
+                "3. スレッド内でもメンションは必要です。",
+                "4. MonoChat との DM でも利用可能です。この場合はメンション不要です。",
+                "5. MonoChat からの返信に :del_monochat: でリアクションすると返信を削除できます。"
+            ])
+        )
+        return
+
+    post_ephemeral_message("Not Implemented")
 
 if __name__ == "__main__":
-    # アプリを起動して、ソケットモードで Slack に接続します
-    SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]).start()
+    try:
+        SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]).start()
+    except KeyboardInterrupt:
+        pass  # Ctrl+C が押された時はエラーではなく正常終了とする.
