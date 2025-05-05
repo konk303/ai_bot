@@ -2,7 +2,7 @@ import os
 import vertexai
 from dotenv import load_dotenv
 from vertexai import agent_engines
-from root_agent import root_agent
+from agents import root_agent
 
 DISPLAY_NAME = "gemini_agent"
 
@@ -33,7 +33,7 @@ if len(remote_apps) == 0:
             "google-cloud-aiplatform[adk,agent_engines]"
         ],
         extra_packages=[
-            "root_agent"
+            "agents"
         ]
     )
 else:
@@ -45,7 +45,7 @@ else:
             "google-cloud-aiplatform[adk,agent_engines]"
         ],
         extra_packages=[
-            "root_agent"
+            "agents"
         ]
     )
 
