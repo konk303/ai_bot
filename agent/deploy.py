@@ -4,7 +4,7 @@ import vertexai
 from dotenv import load_dotenv
 from vertexai import agent_engines
 from vertexai.preview import reasoning_engines
-from agents.client import root_agent
+from agents.client import create_agent
 
 DISPLAY_NAME = "gemini_agent"
 
