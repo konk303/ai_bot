@@ -2,7 +2,7 @@ import os
 import vertexai
 from dotenv import load_dotenv
 from vertexai import agent_engines
-from agents import root_agent
+from agents.client import root_agent
 
 DISPLAY_NAME = "gemini_agent"
 
