@@ -1,7 +1,7 @@
 import re
 from vertexai import agent_engines
 
-agent_engine = agent_engines.get('projects/69263171180/locations/us-central1/reasoningEngines/6920422942245388288')
+agent_engine = agent_engines.get('projects/69263171180/locations/us-central1/reasoningEngines/1948448953628360704')
 
 def create_answer(thread_id: str, message: str):
     """

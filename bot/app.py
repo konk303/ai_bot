@@ -31,7 +31,6 @@ def event_mention(event, say):
     """
     ボットがメンションされた場合に返信する.
     """
-    print(event)
     thread_id = event["thread_ts"] if "thread_ts" in event else event["ts"]
     say({
         "text": agent.create_answer(str(thread_id), event["text"]),
