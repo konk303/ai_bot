@@ -17,6 +17,7 @@ variable "services" {
     "cloudtrace.googleapis.com",
     "maps-backend.googleapis.com",
     "directions-backend.googleapis.com",
+    "geocoding-backend.googleapis.com",
     "routes.googleapis.com",
     "artifactregistry.googleapis.com",
     "run.googleapis.com",

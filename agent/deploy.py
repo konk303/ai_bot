@@ -1,7 +1,9 @@
 import os
+import asyncio
 import vertexai
 from dotenv import load_dotenv
 from vertexai import agent_engines
+from vertexai.preview import reasoning_engines
 from agents.client import root_agent
 
 DISPLAY_NAME = "gemini_agent"
@@ -17,6 +19,23 @@ vertexai.init(
     staging_bucket=STAGING_BUCKET,
 )
 
+# def client_agent():
+#     client, _ = asyncio.run(create_agent())
+#     return client
+
+
+app = reasoning_engines.AdkApp(
+    agent=root_agent,
+    enable_tracing=True,
+)
+
+for event in app.stream_query(
+    user_id="u_123",
+    message="whats the weather in new york",
+):
+    print(event)
+
+
 remote_apps = list(agent_engines.list(filter=f'display_name="{DISPLAY_NAME}"'))
 
 if len(remote_apps) > 1:
@@ -28,7 +47,7 @@ if len(remote_apps) == 0:
     print("create new agent engine")
     remote_app = agent_engines.create(
         display_name=DISPLAY_NAME,
-        agent_engine=root_agent,
+        agent_engine=client_agent(),
         requirements=[
             "google-cloud-aiplatform[adk,agent_engines]"
         ],
@@ -40,7 +59,7 @@ else:
     print("update existing agent engine")
     remote_app = remote_apps[0].update(
         display_name=DISPLAY_NAME,
-        agent_engine=root_agent,
+        agent_engine=asyncio.run(root_agent()[0]),
         requirements=[
             "google-cloud-aiplatform[adk,agent_engines]"
         ],

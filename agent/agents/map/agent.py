@@ -1,13 +1,10 @@
-import asyncio
-from google.genai import types
+import os
+from dotenv import load_dotenv
 from google.adk.agents.llm_agent import LlmAgent
 from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StdioServerParameters
-from google.adk.runners import Runner
-from google.adk.sessions import InMemorySessionService
-from google.adk.artifacts.in_memory_artifact_service import InMemoryArtifactService # Optional
 
-from google.adk.agents.llm_agent import LlmAgent
-from google.adk.tools.mcp_tool.mcp_toolset import MCPToolset, StdioServerParameters
+load_dotenv()
+
 
 async def create_agent():
     """Get tools from MCP Server."""
@@ -19,7 +16,7 @@ async def create_agent():
                   ],
             # Pass the API key as an environment variable to the npx process
             env={
-                "GOOGLE_MAPS_API_KEY": "AIzaSyBPp599jTEL1UrnG27jrISS5F4pNWwxvKQ"
+                "GOOGLE_MAPS_API_KEY": os.getenv("GOOGLE_MAPS_API_KEY", ""),
             }
         )
     )
