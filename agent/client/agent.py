@@ -2,6 +2,7 @@
 
 from google.adk.agents import Agent
 from contextlib import AsyncExitStack
+from google.adk.tools import agent_tool
 
 # sub-agents
 from map.agent import create_agent as create_map_agent
@@ -26,7 +27,8 @@ async def create_agent():
             "\n1. When the user asks for maps/routes/directions, delegate to Map and return its raw list."
             "\n2. For other queries, respond directly without delegation."
         ),
-        sub_agents=[map_agent]
+        # sub_agents=[map_agent]
+        tools=[agent_tool.AgentTool(map_agent)],
     )
 
     return client, exit_stack
