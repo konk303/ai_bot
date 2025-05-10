@@ -2,7 +2,7 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "6.8.0"
+      version = "6.34.0"
     }
   }
 }
@@ -20,8 +20,15 @@ resource "google_project_service" "services" {
   disable_on_destroy = false
 }
 
-module "cloudrun" {
-  source     = "./modules/cloudrun"
+module "bot" {
+  source     = "./modules/bot"
+  project    = var.project
+  region     = var.region
+  depends_on = [google_project_service.services]
+}
+
+module "agent" {
+  source     = "./modules/agent"
   project    = var.project
   region     = var.region
   depends_on = [google_project_service.services]

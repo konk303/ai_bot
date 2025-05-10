@@ -1,0 +1,12 @@
+[project]
+name = "agent"
+version = "0.1.0"
+description = "AI Agent using ADK"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "google-adk>=0.4.0",
+    "google-cloud-aiplatform[adk,agent-engines]>=1.91.0",
+    "litellm>=1.67.6",
+    "python-dotenv>=1.1.0",
+]

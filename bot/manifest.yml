@@ -1,0 +1,39 @@
+display_information:
+  name: gemini
+  description: a gemini bot
+  background_color: "#004492"
+features:
+  bot_user:
+    display_name: gemini
+    always_online: true
+  slash_commands:
+    - command: /gemini
+      description: ask about gemini usage
+      usage_hint: help
+      should_escape: false
+oauth_config:
+  scopes:
+    bot:
+      - app_mentions:read
+      - channels:history
+      - channels:read
+      - chat:write
+      - groups:history
+      - im:history
+      - mpim:history
+      - reactions:read
+      - commands
+settings:
+  event_subscriptions:
+    bot_events:
+      - app_mention
+      - message.channels
+      - message.groups
+      - message.im
+      - message.mpim
+      - reaction_added
+  interactivity:
+    is_enabled: true
+  org_deploy_enabled: false
+  socket_mode_enabled: true
+  token_rotation_enabled: false

@@ -1,16 +1,26 @@
 variable "project" {}
 
 variable "region" {
-  default = "us-central1"
+  default = "asia-northeast1"
 }
 
 variable "zone" {
-  default = "us-central1-c"
+  default = "asia-northeast1-c"
 }
 
 variable "services" {
   type = list(string)
   default = [
+    "aiplatform.googleapis.com",
+    "logging.googleapis.com",
+    "monitoring.googleapis.com",
+    "cloudtrace.googleapis.com",
+    "maps-backend.googleapis.com",
+    "directions-backend.googleapis.com",
+    "geocoding-backend.googleapis.com",
+    "routes.googleapis.com",
+    "parametermanager.googleapis.com",
+    "secretmanager.googleapis.com",
     "artifactregistry.googleapis.com",
     "run.googleapis.com",
     # "compute.googleapis.com",
