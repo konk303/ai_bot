@@ -1,11 +1,13 @@
 """Client agent for the Gemini model, combining whole agents."""
 
+import asyncio
 from google.adk.agents import Agent
 from contextlib import AsyncExitStack
 from google.adk.tools import agent_tool
 
 # sub-agents
 from map.agent import create_agent as create_map_agent
+
 
 async def create_agent():
     """Creates the Client agent that delegates to sub-agents."""
@@ -18,12 +20,7 @@ async def create_agent():
     await exit_stack.enter_async_context(map_stack)
 
     # Create the Coordinator agent
-    client = agent
-
-    return client, exit_stack
-
-
-agent = Agent(
+    client = Agent(
         name="client_agent",
         description="(Japanese)Agent to answer questions about anything, combining other agents",
         model="gemini-2.0-flash",
@@ -34,8 +31,10 @@ agent = Agent(
             "\n2. For other queries, respond directly without delegation."
         ),
         # sub_agents=[map_agent]
-        # tools=[agent_tool.AgentTool(map_agent)],
+        tools=[agent_tool.AgentTool(map_agent)],
     )
+
+    return client, exit_stack
 
 
 # --- New async factory function specifically for deployment ---
@@ -44,7 +43,7 @@ async def deployment_agent_factory():
     Awaits the original create_agent and returns ONLY the agent instance."""
     print("Running deployment_agent_factory...") # Added print for debugging
     # Await the original factory function to get the tuple
-    agent_instance, exit_stack = await create_agent()
+    agent_instance, _ = await create_agent()
 
     # IMPORTANT: The Agent Engine framework expects the function referenced
     # by agent_engine to return *only* the object that implements
@@ -55,5 +54,5 @@ async def deployment_agent_factory():
     print("Deployment factory returning agent instance.")
     return agent_instance
 
+deployment_agent = asyncio.run(deployment_agent_factory())
 root_agent = create_agent()
-deployment_agent = agent

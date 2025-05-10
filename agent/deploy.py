@@ -1,3 +1,4 @@
+import asyncio
 import os
 import vertexai
 from dotenv import load_dotenv
@@ -41,7 +42,7 @@ if len(remote_apps) == 0:
     print("create new agent engine")
     remote_app = agent_engines.create(
         display_name=DISPLAY_NAME,
-        agent_engine="deployment_agent",
+        agent_engine=deployment_agent,
         requirements=[
             "google-cloud-aiplatform[adk,agent_engines]"
         ],
@@ -54,7 +55,7 @@ else:
     print("update existing agent engine")
     remote_app = remote_apps[0].update(
         display_name=DISPLAY_NAME,
-        agent_engine="client.deployment_agent",
+        agent_engine=asyncio.run(root_agent)[0],
         requirements=[
             "google-cloud-aiplatform[adk,agent_engines]"
         ],
