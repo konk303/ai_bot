@@ -1,0 +1,38 @@
+name: Build and Deploy bot
+
+on: workflow_dispatch
+
+jobs:
+  push_to_registry:
+    name: Push Docker image to Artifact Registry
+    runs-on: ubuntu-latest
+    permissions:
+    #   packages: write
+    #   contents: read
+    #   attestations: write
+      id-token: write
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+      - uses: 'google-github-actions/auth@v2'
+        with:
+          project_id: ${{ secrets.GCP_PROJECT }}
+          service_account: ${{ secrets.GCP_DEPLOY_SERVICE_ACCOUNT }}
+          workload_identity_provider: ${{ secrets.GCP_PROVIDER }}
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          version: '>= 363.0.0'
+      - name: docker auth login
+        run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: bot
+          push: true
+          tags: asia-northeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/ai-bot/bot:latest
+      - id: 'deploy'
+        uses: 'google-github-actions/deploy-cloudrun@v2'
+        with:
+          job: ai-bot
+          image: asia-northeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/ai-bot/bot:latest

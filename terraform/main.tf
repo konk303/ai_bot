@@ -33,3 +33,15 @@ module "agent" {
   region     = var.region
   depends_on = [google_project_service.services]
 }
+
+output "provider-name" {
+  value = module.bot.gh-actions-pool-provider-name
+}
+
+output "deployer-name" {
+  value = module.bot.gh-actions-service-account-name
+}
+
+output "bot-job-name" {
+  value = module.bot.bot-job-name
+}
