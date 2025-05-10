@@ -4,10 +4,11 @@ This file defines an agent that interacts with a Vertex AI agent engine.
 It handles creating answers to user messages, managing user sessions,
 and preprocessing input text by removing mentions.
 """
+import os
 import re
 from vertexai import agent_engines
 
-agent_engine = agent_engines.get(os.getenv("GOOGLE_MAPS_API_KEY", ""))
+agent_engine = agent_engines.get(os.getenv("AGENT_ENGINE_RESOURCE"))
 
 
 def create_answer(thread_id: str, message: str):
