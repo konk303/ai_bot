@@ -61,35 +61,53 @@ data "google_secret_manager_secret_version" "agent-engine" {
 #   parameter_data       = "__REF__(\"//secretmanager.googleapis.com/${data.google_secret_manager_secret_version.agent-engine.name}\")"
 # }
 
-resource "google_cloud_run_v2_job" "ai-bot" {
+resource "google_cloud_run_v2_service" "ai-bot" {
   name     = "ai-bot"
   location = var.region
+  ingress  = "INGRESS_TRAFFIC_INTERNAL_ONLY"
+  deletion_protection = false
 
   template {
-    template {
-      containers {
-        image = "${var.region}-docker.pkg.dev/${var.project}/ai-bot/bot:latest"
-        env {
-          name = "SLACK_BOT_TOKEN"
-          value_source {
-            secret_key_ref {
-              secret  = google_secret_manager_secret.slack-token-secret.secret_id
-              version = data.google_secret_manager_secret_version.slack-token.version
-            }
-          }
-        }
-        env {
-          name = "AGENT_ENGINE_RESOURCE"
-          value_source {
-            secret_key_ref {
-              secret  = google_secret_manager_secret.agent-engine-secret.secret_id
-              version = data.google_secret_manager_secret_version.agent-engine.version
-            }
-          }
+    scaling {
+      min_instance_count = 1
+      max_instance_count = 1
+    }
+    # containers {
+    #   image = "${var.region}-docker.pkg.dev/${var.project}/ai-bot/bot:latest"
+    #   resources {
+    #     cpu_idle = true
+    #   }
+
+    #   env {
+    #     name = "SLACK_BOT_TOKEN"
+    #     value_source {
+    #       secret_key_ref {
+    #         secret  = google_secret_manager_secret.slack-token-secret.secret_id
+    #         version = data.google_secret_manager_secret_version.slack-token.version
+    #       }
+    #     }
+    #   }
+    #   env {
+    #     name = "AGENT_ENGINE_RESOURCE"
+    #     value_source {
+    #       secret_key_ref {
+    #         secret  = google_secret_manager_secret.agent-engine-secret.secret_id
+    #         version = data.google_secret_manager_secret_version.agent-engine.version
+    #       }
+    #     }
+    #   }
+    # }
+    containers {
+      image = "nginx"
+      startup_probe {
+        http_get {
+          port = 80
         }
       }
+      ports {
+        container_port = 80
+      }
     }
-    task_count = 1
   }
 }
 
@@ -97,46 +115,6 @@ resource "google_artifact_registry_repository" "ai-bot" {
   repository_id = "ai-bot"
   description   = "ai-bot docker registery"
   format        = "DOCKER"
-}
-
-resource "google_iam_workload_identity_pool" "gh-actions-pool" {
-  workload_identity_pool_id = "gh-actions"
-}
-
-resource "google_iam_workload_identity_pool_provider" "gh-actions-pool-provider" {
-  workload_identity_pool_id          = google_iam_workload_identity_pool.gh-actions-pool.workload_identity_pool_id
-  workload_identity_pool_provider_id = "gh-actions-provider"
-  description                        = "GitHub Actions identity pool provider for automations"
-  attribute_condition                = <<EOT
-    assertion.repository_owner_id == "69647" &&
-    attribute.repository == "konk303/ai_bot"
-EOT
-  attribute_mapping = {
-    "google.subject"       = "assertion.sub"
-    "attribute.actor"      = "assertion.actor"
-    "attribute.aud"        = "assertion.aud"
-    "attribute.repository" = "assertion.repository"
-  }
-  oidc {
-    issuer_uri = "https://token.actions.githubusercontent.com"
-  }
-}
-
-resource "google_service_account" "bot-deployer" {
-  account_id   = "bot-deployer"
-  display_name = "bot deploy executor"
-}
-
-resource "google_service_account_iam_member" "workload-identity-user" {
-  service_account_id = google_service_account.bot-deployer.name
-  role               = "roles/iam.workloadIdentityUser"
-  member             = "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.gh-actions-pool.name}/attribute.repository/konk303/ai_bot"
-}
-
-resource "google_project_iam_member" "artifact-registry-uploader" {
-  project = var.project
-  role    = "roles/artifactregistry.writer"
-  member  = "serviceAccount:${google_service_account.bot-deployer.email}"
 }
 
 output "gh-actions-pool-provider-name" {
@@ -147,7 +125,7 @@ output "gh-actions-service-account-name" {
   value = google_service_account.bot-deployer.email
 }
 
-output "bot-job-name" {
-  value = google_cloud_run_v2_job.ai-bot.id
+output "bot-service-name" {
+  value = google_cloud_run_v2_service.ai-bot.name
 
 }
