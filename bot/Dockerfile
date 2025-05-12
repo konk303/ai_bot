@@ -11,4 +11,4 @@ WORKDIR /app
 RUN uv sync --frozen --no-cache
 
 # Run the application.
-CMD ["uv", "run", "uvicorn", "main:app", "--port", "80"]
+CMD ["uv", "run", "uvicorn", "main:api", "--port", "8080"]

@@ -68,44 +68,29 @@ resource "google_cloud_run_v2_service" "ai-bot" {
   deletion_protection = false
 
   template {
-    scaling {
-      min_instance_count = 1
-      max_instance_count = 1
-    }
-    # containers {
-    #   image = "${var.region}-docker.pkg.dev/${var.project}/ai-bot/bot:latest"
-    #   resources {
-    #     cpu_idle = true
-    #   }
-
-    #   env {
-    #     name = "SLACK_BOT_TOKEN"
-    #     value_source {
-    #       secret_key_ref {
-    #         secret  = google_secret_manager_secret.slack-token-secret.secret_id
-    #         version = data.google_secret_manager_secret_version.slack-token.version
-    #       }
-    #     }
-    #   }
-    #   env {
-    #     name = "AGENT_ENGINE_RESOURCE"
-    #     value_source {
-    #       secret_key_ref {
-    #         secret  = google_secret_manager_secret.agent-engine-secret.secret_id
-    #         version = data.google_secret_manager_secret_version.agent-engine.version
-    #       }
-    #     }
-    #   }
-    # }
     containers {
-      image = "nginx"
-      startup_probe {
-        http_get {
-          port = 80
+      image = "${var.region}-docker.pkg.dev/${var.project}/ai-bot/bot:latest"
+      resources {
+        cpu_idle = true
+      }
+
+      env {
+        name = "SLACK_BOT_TOKEN"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.slack-token-secret.secret_id
+            version = data.google_secret_manager_secret_version.slack-token.version
+          }
         }
       }
-      ports {
-        container_port = 80
+      env {
+        name = "AGENT_ENGINE_RESOURCE"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.agent-engine-secret.secret_id
+            version = data.google_secret_manager_secret_version.agent-engine.version
+          }
+        }
       }
     }
   }
