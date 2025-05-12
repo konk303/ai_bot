@@ -11,4 +11,4 @@ WORKDIR /app
 RUN uv sync --frozen --no-cache
 
 # Run the application.
-CMD ["uv", "run", "module/app.py"]
+CMD ["uv", "run", "uvicorn", "main:app", "--port", "80"]

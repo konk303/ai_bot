@@ -6,8 +6,7 @@ allows for message deletion via reactions, and defines a slash command.
 """
 import os
 from slack_bolt import App
-from slack_bolt.adapter.socket_mode import SocketModeHandler
-import agent
+from . import agent
 
 SLACK_BOT_USER_ID = "U08QRHY4R42"  # BotのユーザID
 SLACK_DELETE_REACTION = "del_gemini"  # 削除用のリアクションを作成しておく
@@ -53,16 +52,14 @@ def message_delete(event):
         event["reaction"] == SLACK_DELETE_REACTION
         and event["item_user"] == SLACK_BOT_USER_ID
     ):
-        response = app.client.chat_delete(
+        app.client.chat_delete(
             channel=event["item"]["channel"], ts=event["item"]["ts"]
         )
 
 
 @app.command("/gemini")
 def handle_slash_command(ack, client, command):
-    """
-    スラッシュコマンドを実行する.
-    """
+    """スラッシュコマンドを実行する."""
     ack()
 
     def post_ephemeral_message(text):
@@ -90,10 +87,3 @@ def handle_slash_command(ack, client, command):
         return
 
     post_ephemeral_message("Not Implemented")
-
-
-if __name__ == "__main__":
-    try:
-        SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]).start()
-    except KeyboardInterrupt:
-        pass  # Ctrl+C が押された時はエラーではなく正常終了とする.
