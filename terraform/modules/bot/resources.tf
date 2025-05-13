@@ -61,19 +61,50 @@ data "google_secret_manager_secret_version" "agent-engine" {
 #   parameter_data       = "__REF__(\"//secretmanager.googleapis.com/${data.google_secret_manager_secret_version.agent-engine.name}\")"
 # }
 
+resource "google_service_account" "bot-executor" {
+  account_id   = "bot-executor"
+  display_name = "bot executor"
+}
+
+resource "google_project_iam_member" "bot-executor-iam" {
+  for_each = toset([
+    "roles/editor",
+    "roles/secretmanager.secretAccessor",
+  ])
+
+  project = var.project
+  role    = each.value
+  member  = "serviceAccount:${google_service_account.bot-executor.email}"
+}
+
+data "google_compute_default_service_account" "default" {
+}
+
+resource "google_service_account_iam_member" "gce-default-account-iam" {
+  service_account_id = data.google_compute_default_service_account.default.name
+  role               = "roles/iam.serviceAccountUser"
+  member             = "serviceAccount:${google_service_account.bot-executor.email}"
+}
+
 resource "google_cloud_run_v2_service" "ai-bot" {
   name     = "ai-bot"
   location = var.region
-  ingress  = "INGRESS_TRAFFIC_INTERNAL_ONLY"
-  deletion_protection = false
+  invoker_iam_disabled = true
 
   template {
+    service_account = google_service_account.bot-executor.email
     containers {
       image = "${var.region}-docker.pkg.dev/${var.project}/ai-bot/bot:latest"
       resources {
-        cpu_idle = true
+        cpu_idle = false
       }
-
+      startup_probe {
+        failure_threshold = 10
+        http_get {
+          path = "/healthz"
+          port = "8080"
+        }
+      }
       env {
         name = "SLACK_BOT_TOKEN"
         value_source {

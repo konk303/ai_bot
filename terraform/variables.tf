@@ -23,7 +23,7 @@ variable "services" {
     "secretmanager.googleapis.com",
     "artifactregistry.googleapis.com",
     "run.googleapis.com",
-    # "compute.googleapis.com",
+    "compute.googleapis.com",
     "storage.googleapis.com",
     "bigquery.googleapis.com",
     # "pubsub.googleapis.com",
