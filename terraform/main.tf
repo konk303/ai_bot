@@ -45,3 +45,11 @@ output "deployer-name" {
 output "bot-service-name" {
   value = module.bot.bot-service-name
 }
+
+output "bot-id" {
+  value = module.bot.bot-id
+}
+
+output "bot-uri" {
+  value = module.bot.bot-uri
+}

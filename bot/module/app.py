@@ -12,7 +12,10 @@ SLACK_BOT_USER_ID = "U08QRHY4R42"  # BotのユーザID
 SLACK_DELETE_REACTION = "del_gemini"  # 削除用のリアクションを作成しておく
 
 # ボットトークンを渡してアプリを初期化します
-app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
+app = App(
+    token=os.environ.get("SLACK_BOT_TOKEN"),
+    signing_secret=os.environ.get("SLACK_SECRET"),
+)
 
 
 # https://tools.slack.dev/bolt-python/ja-jp/getting-started/

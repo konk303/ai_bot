@@ -61,6 +61,36 @@ data "google_secret_manager_secret_version" "agent-engine" {
 #   parameter_data       = "__REF__(\"//secretmanager.googleapis.com/${data.google_secret_manager_secret_version.agent-engine.name}\")"
 # }
 
+resource "google_secret_manager_secret" "slack-secret-secret" {
+  secret_id = "slack-secret"
+
+  labels = {
+    label = "ai-bot-bot"
+  }
+
+  replication {
+    auto {}
+  }
+}
+
+data "google_secret_manager_secret_version" "slack-secret" {
+  secret = google_secret_manager_secret.slack-secret-secret.id
+}
+
+# resource "google_parameter_manager_parameter" "agent-engine" {
+#   parameter_id = "agent-engine"
+
+#   labels = {
+#     label = "ai-bot-bot"
+#   }
+# }
+
+# resource "google_parameter_manager_parameter_version" "agent-engine-production" {
+#   parameter            = google_parameter_manager_parameter.agent-engine.id
+#   parameter_version_id = "production"
+#   parameter_data       = "__REF__(\"//secretmanager.googleapis.com/${data.google_secret_manager_secret_version.agent-engine.name}\")"
+# }
+
 resource "google_service_account" "bot-executor" {
   account_id   = "bot-executor"
   display_name = "bot executor"
@@ -87,8 +117,8 @@ resource "google_service_account_iam_member" "gce-default-account-iam" {
 }
 
 resource "google_cloud_run_v2_service" "ai-bot" {
-  name     = "ai-bot"
-  location = var.region
+  name                 = "ai-bot"
+  location             = var.region
   invoker_iam_disabled = true
 
   template {
@@ -123,6 +153,15 @@ resource "google_cloud_run_v2_service" "ai-bot" {
           }
         }
       }
+      env {
+        name = "SLACK_SECRET"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.slack-secret-secret.secret_id
+            version = data.google_secret_manager_secret_version.slack-secret.version
+          }
+        }
+      }
     }
   }
 }
@@ -133,15 +172,14 @@ resource "google_artifact_registry_repository" "ai-bot" {
   format        = "DOCKER"
 }
 
-output "gh-actions-pool-provider-name" {
-  value = google_iam_workload_identity_pool_provider.gh-actions-pool-provider.name
-}
-
-output "gh-actions-service-account-name" {
-  value = google_service_account.bot-deployer.email
-}
-
 output "bot-service-name" {
   value = google_cloud_run_v2_service.ai-bot.name
+}
 
+output "bot-id" {
+  value = google_cloud_run_v2_service.ai-bot.id
+}
+
+output "bot-uri" {
+  value = google_cloud_run_v2_service.ai-bot.uri
 }

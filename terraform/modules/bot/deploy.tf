@@ -37,3 +37,23 @@ resource "google_project_iam_member" "artifact-registry-uploader" {
   role    = "roles/artifactregistry.writer"
   member  = "serviceAccount:${google_service_account.bot-deployer.email}"
 }
+
+resource "google_project_iam_member" "run-deployer" {
+  project = var.project
+  role    = "roles/run.sourceDeveloper"
+  member  = "serviceAccount:${google_service_account.bot-deployer.email}"
+}
+
+resource "google_project_iam_member" "service-account-user" {
+  project = var.project
+  role    = "roles/iam.serviceAccountUser"
+  member  = "serviceAccount:${google_service_account.bot-deployer.email}"
+}
+
+output "gh-actions-pool-provider-name" {
+  value = google_iam_workload_identity_pool_provider.gh-actions-pool-provider.name
+}
+
+output "gh-actions-service-account-name" {
+  value = google_service_account.bot-deployer.email
+}

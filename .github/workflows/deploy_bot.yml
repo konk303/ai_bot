@@ -35,4 +35,5 @@ jobs:
         uses: 'google-github-actions/deploy-cloudrun@v2'
         with:
           service: ai-bot
+          region: asia-northeast1
           image: asia-northeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/ai-bot/bot:latest
