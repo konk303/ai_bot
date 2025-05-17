@@ -21,6 +21,7 @@ def create_answer(thread_id: str, message: str):
             session_id=_get_or_create_session_id(thread_id),
             message=_remove_mention_string(message),
         ):
+            print(event)
             result = event["content"]["parts"][0]
             if "text" in result:
                 answers.append(result["text"])

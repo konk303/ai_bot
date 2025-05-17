@@ -177,3 +177,6 @@ cython_debug/
 .terraform/
 terraform.tfstate
 terraform.tfstate*.backup
+
+gcp-oauth.keys.json
+.gdrive-server-credentials.json
