@@ -25,15 +25,19 @@ jobs:
           version: '>= 363.0.0'
       - name: docker auth login
         run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: bot
           push: true
-          tags: asia-northeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/ai-bot/bot:latest
+          tags: asia-northeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/ai-bot/bot:${{ github.sha }},asia-northeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/ai-bot/bot:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
       - id: 'deploy'
         uses: 'google-github-actions/deploy-cloudrun@v2'
         with:
           service: ai-bot
           region: asia-northeast1
-          image: asia-northeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/ai-bot/bot:latest
+          image: asia-northeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/ai-bot/bot:${{ github.sha }}
