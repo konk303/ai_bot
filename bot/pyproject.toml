@@ -5,6 +5,8 @@ description = "Slackbot"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "fastapi>=0.115.12",
     "google-cloud-aiplatform[agent-engines]>=1.91.0",
     "slack-bolt>=1.23.0",
+    "uvicorn>=0.34.2",
 ]
