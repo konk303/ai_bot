@@ -33,14 +33,14 @@ async def main():
     #     ):
     #         print(event)
 
-    agent, exit_stack = await create_agent(dummy=True)
-
     remote_apps = list(agent_engines.list(filter=f'display_name="{DISPLAY_NAME}"'))
 
     if len(remote_apps) > 1:
         for remote_app in remote_apps[1:]:
             print("delete old agent engine")
             remote_app.delete(force=True)
+
+    agent, _ = await create_agent()
 
     if len(remote_apps) == 0:
         print("create new agent engine")

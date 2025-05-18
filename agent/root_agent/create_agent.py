@@ -20,15 +20,15 @@ async def create_agent(dummy: bool = False):
     await exit_stack.enter_async_context(map_stack)
 
     tools = [
-            agent_tool.AgentTool(google_search_agent),
+            agent_tool.AgentTool(agent=google_search_agent),
             # agent_tool.AgentTool(agent=map_agent)
         ]
-    if not dummy:
-        tools.extend(
-            [
-                agent_tool.AgentTool(agent=map_agent)
-            ]
-        )
+    # if not dummy:
+    #     tools.extend(
+    #         [
+    #             agent_tool.AgentTool(agent=map_agent)
+    #         ]
+    #     )
 
 
     # Create the Coordinator agent
