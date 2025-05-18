@@ -6,6 +6,7 @@ and preprocessing input text by removing mentions.
 """
 import os
 import re
+from markdown_to_mrkdwn import SlackMarkdownConverter
 from vertexai import agent_engines
 
 agent_engine = agent_engines.get(os.getenv("AGENT_ENGINE_RESOURCE"))
@@ -13,6 +14,7 @@ agent_engine = agent_engines.get(os.getenv("AGENT_ENGINE_RESOURCE"))
 
 def create_answer(thread_id: str, message: str):
     """Create an answer for the given user and session."""
+    md_converter = SlackMarkdownConverter()
     answers = []
     try:
         for event in agent_engine.stream_query(
@@ -37,7 +39,7 @@ def create_answer(thread_id: str, message: str):
                 "```",
             ]
         )
-    return "\n".join(answers)
+    return md_converter.convert("\n".join(answers))
 
 
 def _get_or_create_session_id(thread_id: str):
