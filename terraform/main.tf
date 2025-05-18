@@ -1,4 +1,9 @@
 terraform {
+  backend "gcs" {
+    bucket = "terraform-remote-backend-konk303"
+    prefix = "terraform/state"
+  }
+
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -18,6 +23,13 @@ resource "google_project_service" "services" {
   project            = var.project
   service            = each.value
   disable_on_destroy = false
+}
+
+module "backend" {
+  source     = "./modules/backend"
+  project    = var.project
+  region     = var.region
+  depends_on = [google_project_service.services]
 }
 
 module "bot" {

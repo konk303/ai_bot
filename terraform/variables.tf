@@ -19,6 +19,7 @@ variable "services" {
     "directions-backend.googleapis.com",
     "geocoding-backend.googleapis.com",
     "routes.googleapis.com",
+    "drive.googleapis.com",
     "parametermanager.googleapis.com",
     "secretmanager.googleapis.com",
     "artifactregistry.googleapis.com",

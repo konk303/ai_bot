@@ -79,11 +79,11 @@ def handle_slash_command(ack, client, command):
         post_ephemeral_message(
             "\n".join(
                 [
-                    "1. Gemini をメンションすると Azure OpenAI Service (ChatGPT) からのレスポンスが返されます。",
+                    "1. gemini をメンションすると Google Gemini からのレスポンスが返されます。",
                     "2. スレッド内でやり取りを繰り返すと、それまでの会話を考慮した回答がおこなわれます。",
                     "3. スレッド内でもメンションは必要です。",
-                    "4. MonoChat との DM でも利用可能です。この場合はメンション不要です。",
-                    "5. MonoChat からの返信に :del_monochat: でリアクションすると返信を削除できます。",
+                    "4. gemini との DM でも利用可能です。この場合はメンション不要です。",
+                    f"5. gemini からの返信に :{SLACK_DELETE_REACTION}: でリアクションすると返信を削除できます。",
                 ]
             )
         )
