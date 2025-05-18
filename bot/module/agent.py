@@ -13,7 +13,6 @@ agent_engine = agent_engines.get(os.getenv("AGENT_ENGINE_RESOURCE"))
 
 def create_answer(thread_id: str, message: str):
     """Create an answer for the given user and session."""
-    print(thread_id, _get_or_create_session_id(thread_id))
     answers = []
     try:
         for event in agent_engine.stream_query(
