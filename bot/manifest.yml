@@ -8,6 +8,7 @@ features:
     always_online: true
   slash_commands:
     - command: /gemini
+      url: https://ai-bot-dcgp26pi5a-an.a.run.app/slack/events
       description: ask about gemini usage
       usage_hint: help
       should_escape: false
@@ -25,6 +26,7 @@ oauth_config:
       - commands
 settings:
   event_subscriptions:
+    request_url: https://ai-bot-dcgp26pi5a-an.a.run.app/slack/events
     bot_events:
       - app_mention
       - message.channels
@@ -34,6 +36,7 @@ settings:
       - reaction_added
   interactivity:
     is_enabled: true
+    request_url: https://ai-bot-dcgp26pi5a-an.a.run.app/slack/events
   org_deploy_enabled: false
-  socket_mode_enabled: true
+  socket_mode_enabled: false
   token_rotation_enabled: false
