@@ -56,4 +56,4 @@ def _get_or_create_session_id(thread_id: str):
 
 def _remove_mention_string(text: str) -> str:
     """テキストからメンション文字列を削除する."""
-    return re.sub(r"<@.+?>", "", text, 1).strip()
+    return re.sub(r"<@.+?>", "", text, count=1).strip()
