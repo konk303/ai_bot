@@ -1,56 +1,56 @@
-# Bot Tests
+# ボットテスト
 
-This directory contains tests for the Slack bot components.
+このディレクトリにはSlackボットコンポーネントのテストが含まれています。
 
-## Test Structure
+## テスト構成
 
-- `test_simple.py` - Unit tests for basic functionality and utilities
-- `test_fastapi.py` - Tests for FastAPI endpoints (health check, Slack events)
-- `test_agent.py` - Tests for the agent module (mention removal functionality)
-- `conftest.py` - Shared test fixtures and configuration
+- `test_simple.py` - 基本機能とユーティリティのユニットテスト
+- `test_fastapi.py` - FastAPIエンドポイントのテスト（ヘルスチェック、Slackイベント）
+- `test_agent.py` - エージェントモジュールのテスト（メンション削除機能）
+- `conftest.py` - 共有テストフィクスチャと設定
 
-## Running Tests
+## テスト実行
 
 ```bash
-# Install test dependencies
+# テスト依存関係をインストール
 uv sync --extra test
 
-# Run all working tests
+# 動作するテストをすべて実行
 uv run pytest tests/test_simple.py tests/test_fastapi.py tests/test_agent.py::TestRemoveMentionString -v
 
-# Run specific test files
+# 特定のテストファイルを実行
 uv run pytest tests/test_simple.py -v
 uv run pytest tests/test_fastapi.py -v
 
-# Run with coverage (if coverage package is added)
+# カバレッジ付きで実行（coverageパッケージを追加した場合）
 uv run pytest --cov=module tests/
 ```
 
-## Test Coverage
+## テストカバレッジ
 
-### Working Tests ✅
-- **Mention removal logic** - Tests the regex-based mention removal from Slack messages
-- **FastAPI endpoints** - Tests health check and Slack events endpoints structure  
-- **Basic utilities** - Tests environment variable mocking and basic functionality
+### 動作中のテスト ✅
+- **メンション削除ロジック** - Slackメッセージからの正規表現ベースのメンション削除テスト
+- **FastAPIエンドポイント** - ヘルスチェックとSlackイベントエンドポイント構造のテスト  
+- **基本ユーティリティ** - 環境変数モックと基本機能のテスト
 
-### Tests Requiring Infrastructure 🚧
-Some tests require actual Vertex AI and Slack API access and are not suitable for unit testing:
-- Agent engine integration tests
-- Slack app event handler tests (require valid Slack tokens)
-- Full end-to-end message processing tests
+### インフラが必要なテスト 🚧
+一部のテストは実際のVertex AIとSlack APIアクセスが必要で、ユニットテストには適していません：
+- エージェントエンジン統合テスト
+- Slackアプリイベントハンドラテスト（有効なSlackトークンが必要）
+- エンドツーエンドメッセージ処理テスト
 
-## Test Philosophy
+## テスト哲学
 
-The tests focus on:
-1. **Pure functions** - Logic that doesn't depend on external services
-2. **API structure** - Ensuring endpoints exist and respond correctly
-3. **Error handling** - Testing edge cases and validation
-4. **Mocking external dependencies** - For isolated unit testing
+テストは以下に焦点を当てています：
+1. **純粋関数** - 外部サービスに依存しないロジック
+2. **API構造** - エンドポイントが存在し正しく応答することの確認
+3. **エラーハンドリング** - エッジケースと検証のテスト
+4. **外部依存関係のモック** - 分離されたユニットテストのため
 
-## Adding New Tests
+## 新しいテストの追加
 
-When adding new tests:
-1. Test pure business logic first
-2. Mock external dependencies (Vertex AI, Slack API)
-3. Use fixtures for reusable test data
-4. Keep tests isolated and independent
+新しいテストを追加する際は：
+1. まず純粋なビジネスロジックをテスト
+2. 外部依存関係（Vertex AI、Slack API）をモック
+3. 再利用可能なテストデータにはフィクスチャを使用
+4. テストを分離し独立させる
